@@ -64,7 +64,6 @@ cmake-build-debug/
 
 # PlatformIO
 .pio/
-platformio.ini
 
 # VS Code
 .vscode/
