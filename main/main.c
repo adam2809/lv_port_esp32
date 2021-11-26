@@ -49,6 +49,10 @@ static void guiTask(void *pvParameter);
 // static void hello_world(void);
 static void display_image(void);
 
+lv_obj_t * num_col_0;
+lv_obj_t * num_col_1;
+lv_obj_t * num_col_2;
+int counter = 0;
 /**********************
  *   APPLICATION MAIN
  **********************/
@@ -110,6 +114,20 @@ static void guiTask(void *pvParameter) {
         /* Delay 1 tick (assumes FreeRTOS tick is 10ms */
         vTaskDelay(pdMS_TO_TICKS(10));
 
+        counter%=1000;
+        ESP_LOGI(TAG,"Counter: %d",counter);
+        lv_img_set_src(num_col_2, digits[counter%10]);
+        if(counter > 9){
+          lv_img_set_src(num_col_1, digits[(counter%100)/10]);
+        }else{
+          lv_img_set_src(num_col_1, digits[0]);
+        }
+        if(counter > 99){
+          lv_img_set_src(num_col_0, digits[counter/100]);
+        }else{
+          lv_img_set_src(num_col_0, digits[0]);
+        }
+        counter++;
         /* Try to take the semaphore, call lvgl related function on success */
         if (pdTRUE == xSemaphoreTake(xGuiSemaphore, portMAX_DELAY)) {
             lv_task_handler();
@@ -130,27 +148,27 @@ static void guiTask(void *pvParameter) {
 //     lv_obj_align(label1, NULL, LV_ALIGN_CENTER, 0, 0);
 // }
 
-
 static void display_image(void){
     LV_IMG_DECLARE(zero);
     LV_IMG_DECLARE(two);
 
     lv_obj_t * scr = lv_disp_get_scr_act(NULL);
-    lv_obj_t * img_zero = lv_img_create(scr,NULL);
-    lv_obj_t * img_one = lv_img_create(scr,NULL);
-    lv_obj_t * img_two = lv_img_create(scr,NULL);
+    num_col_0 = lv_img_create(scr,NULL);
+    num_col_1 = lv_img_create(scr,NULL);
+    num_col_2 = lv_img_create(scr,NULL);
 
-    lv_img_set_src(img_zero, digits[8]);
-    lv_img_set_src(img_one, digits[4]);
-    lv_img_set_src(img_two, digits[7]);
+    lv_img_set_src(num_col_0, digits[0]);
+    lv_img_set_src(num_col_1, digits[0]);
+    lv_img_set_src(num_col_2, digits[0]);
 
-    lv_obj_align(img_zero, NULL, LV_ALIGN_IN_BOTTOM_LEFT,DIGITS_ROW_1_X_OFFSET,DIGIT_1_Y_OFFSET);
-    lv_obj_align(img_one, NULL, LV_ALIGN_IN_BOTTOM_LEFT,DIGITS_ROW_1_X_OFFSET, DIGIT_2_Y_OFFSET);
-    lv_obj_align(img_two, NULL, LV_ALIGN_IN_BOTTOM_LEFT,DIGITS_ROW_1_X_OFFSET, DIGIT_3_Y_OFFSET);
+    lv_obj_align(num_col_0, NULL, LV_ALIGN_IN_BOTTOM_LEFT,DIGITS_ROW_1_X_OFFSET,DIGIT_1_Y_OFFSET);
+    lv_obj_align(num_col_1, NULL, LV_ALIGN_IN_BOTTOM_LEFT,DIGITS_ROW_1_X_OFFSET, DIGIT_2_Y_OFFSET);
+    lv_obj_align(num_col_2, NULL, LV_ALIGN_IN_BOTTOM_LEFT,DIGITS_ROW_1_X_OFFSET, DIGIT_3_Y_OFFSET);
 }
 
 static void lv_tick_task(void *arg) {
     (void) arg;
+
 
     lv_tick_inc(LV_TICK_PERIOD_MS);
 }
